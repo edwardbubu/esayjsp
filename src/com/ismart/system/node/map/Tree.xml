@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+    PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" 
+    "http://www.ibatis.com/dtd/sql-map-2.dtd">
+<sqlMap namespace="Tree">
+	<typeAlias alias="tree" type="com.sp.system.tree.model.Tree" />
+		<select id="treeQuery" resultClass="tree" parameterClass="tree">
+		<![CDATA[select t.*
+				  from sp_tree t
+				 where (t.type = #type# OR #type# = '')
+				   and (t.pid =#pid# OR #pid# = '')
+				   and (t.level =#level# OR #level# = '')
+				   and t.enable='是'
+				   and t.type!='NAVIGATION'
+		]]>
+		</select>
+</sqlMap>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+    PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" 
+    "http://www.ibatis.com/dtd/sql-map-2.dtd">
+<sqlMap namespace="Code">
+	<typeAlias alias="code" type="com.ismart.system.code.domain.Code" />
+	<typeAlias alias="codetype" type="com.ismart.system.code.domain.CodeType" />
+		
+		<select id="queryCodeInfo" resultClass="code" parameterClass="code">
+		<![CDATA[select t.*
+				  from code_info t
+				 where t.codetypename like '%$codetypename$%'
+				   and t.codename like '%$codename$%'
+				   and t.codecname like '%$codecname$%'
+				   order by t.codetypename, t.codename
+		]]>
+		</select>
+		
+		<select id="queryCodeType" resultClass="codetype" parameterClass="codetype">
+		<![CDATA[select t.*
+				  from code_type t
+				 where t.codetypename like '%$codetypename$%'
+				   and t.codetypecname like '%$codetypecname$%'
+		]]>
+		</select>
+		
+		<select id="getAuotIdFromCodeInfo" resultClass="java.lang.String">
+		<![CDATA[select max(codeid)+1 from code_info]]>
+		</select>
+		<select id="getAuotIdFromCodeType" resultClass="java.lang.String">
+		<![CDATA[select max(codetypeid)+1 from code_type]]>
+		</select>
+		
+		<insert id="insertCode" parameterClass="code">
+			INSERT INTO code_info ( codeid,codetypename,codename,codecname) VALUES (#codeid#,#codetypename#,#codename#,#codecname#)
+		</insert>
+		
+		<delete id="deleteCode" parameterClass="java.lang.String">
+			delete from code_info where codeid=#codeid#
+		</delete>
+		
+		<update id="updateCode" parameterClass="code">
+		<![CDATA[   UPDATE code_info  SET codetypename=#codetypename#, codename=#codename# ,codecname = #codecname# where codeid=#codeid#]]>
+		</update> 
+		
+		<insert id="insertCodeType" parameterClass="codetype">
+			INSERT INTO code_type ( codetypeid,codetypename,codetypecname) VALUES (#codetypeid#,#codetypename#,#codetypecname#)
+		</insert>
+		
+		<delete id="deleteCodeType" parameterClass="java.lang.String">
+			delete from code_type where codetypeid=#codetypeid#
+		</delete>
+		
+		<delete id="deleteCodeInfoByType" parameterClass="java.lang.String">
+			delete from code_info where codetypename like #codetypename#
+		</delete>
+		
+		<update id="updateCodeType" parameterClass="codetype">
+		<![CDATA[   UPDATE code_type  SET codetypename=#codetypename#, codetypecname=#codetypecname# where codetypeid=#codetypeid#]]>
+		</update> 
+		
+		
+	<!--<select id="getAllNums" parameterClass="java.lang.String">
+		<![CDATA[    select  count(*)  from clients ]]>
+	</select>	
+	<update id="updateUser" parameterClass="user">
+		<![CDATA[   UPDATE t_user  SET name=#name#, sex=#sex# WHERE id = #id# ]]>
+	</update>	
+	-->
+</sqlMap>

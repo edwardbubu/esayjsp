@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+    PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" 
+    "http://www.ibatis.com/dtd/sql-map-2.dtd">
+<sqlMap namespace="Tree">
+	<typeAlias alias="node" type="com.ismart.system.node.domain.Node" />
+		<select id="nodeTree" resultClass="node" parameterClass="node">
+		<![CDATA[select st.*
+				  from node_info st
+				 where 
+				  (st.pid = #pid# or #pid#='')
+				   and (st.level = #level# or #level#='')
+		]]>
+		</select>
+</sqlMap>

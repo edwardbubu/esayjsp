@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+    PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" 
+    "http://www.ibatis.com/dtd/sql-map-2.dtd">
+<sqlMap namespace="User">
+	<typeAlias alias="supply" type="com.ismart.finance.supply.domain.Supply" />
+		
+		<select id="QuerySupplyInfo" resultClass="supply" parameterClass="supply">
+		<![CDATA[select t.*
+				  from supply_info t
+				 where t.supplypename like '%$supplypename$%'
+				   and t.supplypenphone like '%$supplypenphone$%'
+				   and (t.supplypentype = #supplypentype# or #supplypentype# ='')
+		]]>
+		</select>
+		<select id="getSupplyId" resultClass="java.lang.String">
+		<![CDATA[select max(supplypenid)+1 from supply_info]]>
+		</select>
+		
+		<insert id="insertSupply" parameterClass="supply">
+			INSERT INTO supply_info ( supplypenid,supplypename,supplyorgname,supplypenphone,supplypenemail,supplypenqq,supplypenweixin,supplypenadd,supplypensadd,supplypenfadd,supplypentype,supplypenlink,supplypentext) 
+			VALUES (#supplypenid#,#supplypename#,#supplyorgname#,#supplypenphone#,#supplypenemail#,#supplypenqq#,#supplypenweixin#,#supplypenadd#,#supplypensadd#,#supplypenfadd#,#supplypentype#,#supplypenlink#,#supplypentext# )
+		</insert>
+		
+		<delete id="deleteSupply" parameterClass="java.lang.String">
+			delete from supply_info where supplypenid=#supplypenid#
+		</delete>
+		
+		<update id="updateSupply" parameterClass="supply">
+		<![CDATA[   UPDATE supply_info  SET supplypename=#supplypename#, supplyorgname=#supplyorgname# ,supplypenphone = #supplypenphone#,supplypenemail = #supplypenemail#,supplypenqq = #supplypenqq#,supplypenweixin = #supplypenweixin#, supplypenadd = #supplypenadd#, supplypensadd = #supplypensadd#, supplypenfadd = #supplypenfadd#, supplypentype = #supplypentype#, supplypenlink = #supplypenlink#, supplypentext = #supplypentext# where supplypenid=#supplypenid#]]>
+		</update> 
+		
+		
+</sqlMap>

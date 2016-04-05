@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+  	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+	http://www.springframework.org/schema/tx 
+  	http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+  	http://www.springframework.org/schema/aop 
+  	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+	<bean id="sysuserservices"
+		class="com.ismart.system.user.serviceImp.SysuserServiceImp">
+		<property name="sqlMapClient" ref="sqlMapClient"></property>
+	</bean>
+	<bean name="sysuserAction" class="com.ismart.system.user.action.UserAction">
+		<property name="sysuserService" ref="sysuserservices"></property>
+	</bean>
+	<bean id="roleservices"
+		class="com.ismart.system.user.serviceImp.RoleServiceImp">
+		<property name="sqlMapClient" ref="sqlMapClient"></property>
+	</bean>
+	<bean name="roleAction" class="com.ismart.system.user.action.RoleAction">
+		<property name="roleService" ref="roleservices"></property>
+	</bean>
+	<bean id="codeservices"
+		class="com.ismart.system.code.serviceImp.CodeServiceImp">
+		<property name="sqlMapClient" ref="sqlMapClient"></property>
+	</bean>
+	<bean name="codeAction" class="com.ismart.system.code.action.CodeAction">
+		<property name="codeService" ref="codeservices"></property>
+	</bean>
+	<bean id="treeservices"
+		class="com.ismart.system.tree.serviceImp.TreeServiceImp">
+		<property name="sqlMapClient" ref="sqlMapClient"></property>
+	</bean>
+	<bean name="treeAction" class="com.ismart.system.tree.action.TreeAction">
+		<property name="treeService" ref="treeservices"></property>
+	</bean>
+	<bean id="nodeservices"
+		class="com.ismart.system.node.serviceImp.NodeServiceImp">
+		<property name="sqlMapClient" ref="sqlMapClient"></property>
+	</bean>
+	<bean name="nodeAction" class="com.ismart.system.node.action.NodeAction">
+		<property name="nodeService" ref="nodeservices"></property>
+	</bean>
+	
+	<bean id="cbservices"
+		class="com.ismart.system.code.serviceImp.CboxServiceImp">
+		<property name="sqlMapClient" ref="sqlMapClient"></property>
+	</bean>
+	<bean name="cbAction" class="com.ismart.system.code.action.CboxAction">
+		<property name="cbService" ref="cbservices"></property>
+	</bean>
+	
+	<!-- 
+	<bean id="userservices"
+		class="com.sp.system.user.serviceImp.UserServiceImp">
+		<property name="sqlMapClient" ref="sqlMapClient"></property>
+	</bean>
+	<bean name="userAction" class="com.sp.system.user.action.UserAction">
+		<property name="userService" ref="userservices"></property>
+	</bean>
+	 -->
+	
+<!-- 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	  <property name="locations" value="classpath:com/ismart/util/PoolConfig/PoolConfig.properties"/>
+	</bean> -->
+	
+	<!-- <bean id="dataSource" destroy-method="close"
+	    class="org.apache.commons.dbcp.BasicDataSource">
+	  <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+	  <property name="url" value="jdbc:mysql://115.238.250.76:3306/sq_hxyjs821037"/>
+	  <property name="username" value="sq_hxyjs821037"/>
+	  <property name="password" value="mdb967"/>
+	</bean> -->
+ 	<bean id="dataSource" destroy-method="close"
+	    class="org.apache.commons.dbcp.BasicDataSource">
+	  <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+	  <property name="url" value="jdbc:mysql://localhost:3306/test"/>
+	  <property name="username" value="root"/>
+	  <property name="password" value="root"/>
+	</bean>
+	<bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+	   <property name="configLocation" value="classpath:com/ismart/util/maps/SqlMapConfig.xml"/>
+	   <property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<!-- 
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+	
+	  		<property name="dataSource" ref="dataSource"/>
+	  </bean>
+  
+
+	
+	<tx:advice id="defaultTxAdvice" transaction-manager="txManager">
+	    <tx:attributes>
+	      <tx:method name="get*" read-only="true"/>
+	      <tx:method name="insert*" propagation="REQUIRED"/>
+	    </tx:attributes>
+	  </tx:advice>
+	
+	<aop:config>
+
+    <aop:pointcut id="defaultServiceOperation"
+          expression="execution(* com.sp.service..*(..))"/>
+
+
+    <aop:advisor pointcut-ref="defaultServiceOperation" advice-ref="defaultTxAdvice"/>
+  </aop:config>
+
+	 -->
+	  
+
+
+	
+</beans>

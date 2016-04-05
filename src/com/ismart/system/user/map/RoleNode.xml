@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+    PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" 
+    "http://www.ibatis.com/dtd/sql-map-2.dtd">
+<sqlMap namespace="RoleNode">
+	<typeAlias alias="roleNode" type="com.ismart.system.user.domain.RoleNode" />
+		
+		<select id="queryRoleNode" resultClass="roleNode" parameterClass="roleNode">
+		<![CDATA[select DISTINCT t.*
+				  from role_node t
+				 where (t.rolenodeid = #rolenodeid# or #rolenodeid#='')
+				   and (t.nodeid = #nodeid# or #nodeid#='')
+				   and t.usertypename like '%$usertypename$%'
+				   order by t.usertypename, t.nodeid
+		]]>
+		</select>
+			
+		<select id="getAuotIdFromRoleNode" resultClass="java.lang.String">
+		<![CDATA[select max(rolenodeid)+1 from role_node]]>
+		</select>
+		
+		<insert id="insertRoleNode" parameterClass="roleNode">
+			INSERT INTO role_node ( rolenodeid,nodeid,usertypename) VALUES (#rolenodeid#,#nodeid#,#usertypename#)
+		</insert>
+		
+		<delete id="deleteRoleNode" parameterClass="java.lang.String">
+			delete from role_node where rolenodeid=#rolenodeid#
+		</delete>
+		
+		<update id="updateRoleNode" parameterClass="roleNode">
+		<![CDATA[   UPDATE role_node  SET nodeid=#nodeid#, usertypename=#usertypename# where rolenodeid=#rolenodeid#]]>
+		</update> 
+		
+		
+	<!--<select id="getAllNums" parameterClass="java.lang.String">
+		<![CDATA[    select  count(*)  from clients ]]>
+	</select>	
+	<update id="updateUser" parameterClass="user">
+		<![CDATA[   UPDATE t_user  SET name=#name#, sex=#sex# WHERE id = #id# ]]>
+	</update>	
+	-->
+</sqlMap>

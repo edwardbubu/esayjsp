@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMapConfig 
+    PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN" 
+    "http://www.ibatis.com/dtd/sql-map-config-2.dtd">
+<sqlMapConfig>
+	<settings 
+	cacheModelsEnabled="true" 
+	enhancementEnabled="true"
+	lazyLoadingEnabled="true" 
+	errorTracingEnabled="true" 
+	maxRequests="32"
+	maxSessions="10" 
+	maxTransactions="5" 
+	useStatementNamespaces="false" />
+	
+	
+	<sqlMap resource="com/ismart/system/user/map/SysUser.xml" />
+	<sqlMap resource="com/ismart/system/user/map/RoleNode.xml" />
+	<sqlMap resource="com/ismart/system/code/map/Code.xml" />  
+	<sqlMap resource="com/ismart/system/node/map/Node.xml" />  
+	<sqlMap resource="com/ismart/system/tree/map/Tree.xml" />
+	<sqlMap resource="com/ismart/system/code/map/Cbox.xml" />
+	<sqlMap resource="com/ismart/finance/supply/map/Supply.xml" />
+</sqlMapConfig>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+    PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" 
+    "http://www.ibatis.com/dtd/sql-map-2.dtd">
+<sqlMap namespace="User">
+	<typeAlias alias="sysuser" type="com.ismart.system.user.domain.SystemUser" />
+	<typeAlias alias="node" type="com.ismart.system.node.domain.Node" />
+		<select id="getLoginInfo11" resultClass="sysuser" parameterClass="sysuser">
+		<![CDATA[select t.* from sys_user t where t.loginname = #loginname# and t.password= #password# and t.disabledate>now()]]>
+		</select>
+		<select id="getQuery11" resultClass="sysuser" parameterClass="sysuser">
+		<![CDATA[select t.*
+				  from sys_user t
+				 where t.loginname like '%$loginname$%'
+				   and t.username like '%$username$%'
+				   and (t.usertype = #usertype# or #usertype# ='')
+				   and (t.disabledate = str_to_date(#disabledate#, '%Y-%m-%d') or #disabledate# ='')
+		]]>
+		</select>
+		<select id="getUserId11" resultClass="java.lang.String">
+		<![CDATA[select max(userid)+1 from sys_user]]>
+		</select>
+		
+		<insert id="insertUser11" parameterClass="sysuser">
+			INSERT INTO sys_user ( userid,loginname,password,username,createdate,lastupdatedate,usertype,disabledate) VALUES (#userid#,#loginname#,#password#,#username#,now(),now(),#usertype#,str_to_date(#disabledate#,'%Y-%m-%d') )
+		</insert>
+		
+		<delete id="deleteUser11" parameterClass="java.lang.String">
+			delete from sys_user where userid=#userid#
+		</delete>
+		
+		<update id="updateUser11" parameterClass="sysuser">
+		<![CDATA[   UPDATE sys_user  SET loginname=#loginname#, password=#password# ,username = #username#,lastupdatedate = now(),usertype = #usertype#,disabledate =  str_to_date(#disabledate#,'%Y-%m-%d') where userid=#userid#]]>
+		</update> 
+		
+		<select id="navigation11" resultClass="node" parameterClass="sysuser">
+		<![CDATA[
+		         select DISTINCT  t1.* from node_info t1
+                 left join role_node t2
+                 on t1.nodeid = t2.nodeid
+                 left join sys_user t3
+                 on t2.usertypename = t3.usertype
+                 where (t3.loginname = #loginname# or #loginname#='')
+				   order by t1.sporder
+		]]>
+		</select>
+	<!--<select id="getAllNums" parameterClass="java.lang.String">
+		<![CDATA[    select  count(*)  from clients ]]>
+	</select>	
+	<update id="updateUser" parameterClass="user">
+		<![CDATA[   UPDATE t_user  SET name=#name#, sex=#sex# WHERE id = #id# ]]>
+	</update>	
+	-->
+</sqlMap>

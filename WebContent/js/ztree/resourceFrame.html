@@ -1,0 +1,514 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <base href="$!{basePath}">
+    <title>系统栏目维护</title>
+    <meta http-equiv="content-type" content="text/html; charset=GBK">
+    <link rel="stylesheet" type="text/css" href="css/tree/zTreeStyle.css"/>
+    <link id="easyuiTheme" rel="stylesheet" type="text/css" href="css/easyui/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="css/easyui/icon.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css"/>
+
+
+    <script type="text/javascript" src="js/jQuery/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="js/jQuery/jquery.ztree.core-3.2.min.js"></script>
+    <script type="text/javascript" src="js/jQuery/jquery.ztree.exedit-3.2.min.js"></script>
+    <script type="text/javascript" src="js/jQuery/jquery.easyui.min.js"></script>
+    <script type="text/javascript" charset="UTF-8" src="js/jQuery/easyui-lang-zh_CN.js"></script>
+
+    <script type="text/javascript" src="js/Config.js"></script>
+    <script type="text/javascript" src="js/appEntry/AppStandard.js"></script>
+    <script type="text/javascript" src="js/tools/AjaxProcess.js"></script>
+    <script type="text/javascript">
+        //   防止超出浏览器边界
+        var easyuiPanelOnMove = function(left, top) {
+            if (left < 0) {
+                $(this).window('move', {
+                    left : 1
+                });
+            }
+            if (top < 0) {
+                $(this).window('move', {
+                    top : 1
+                });
+            } }
+        $.fn.dialog.defaults.onMove = easyuiPanelOnMove;
+    </script>
+</head>
+
+<body class="easyui-layout">
+<div region="west" split="true" title="拖动栏目可以调整顺序"  style="width:190px;overflow-x:hidden;">
+    <ul id="tree" class="ztree" style="width:300px;"></ul>
+
+</div>
+<!--<div region="west" split="true" title="系统栏目" href="resource/resourceTree!treePage.action" style="width:170px;overflow-x:hidden;"></div>-->
+<!--<div region="west" split="true" title="系统栏目" href="page/platform/resource/ztree.html" style="width:170px;overflow-x:hidden;"></div>-->
+<!--<div region="center"  href="page/platform/resource/resourceList.html" style="overflow:hidden;"></div>-->
+<div region="center"  style="overflow:hidden;">
+    <table id="resourceList"></table>
+    <div id="resourceDialog" closed="true" title="栏目维护" class="easyui-dialog" toolbar="#resBar" style="width: 700px;height: 400px">
+        <form id="resourceFrm" action="resource/resourceAction.action" method="post">
+            <table border="0" width="100%">
+                <tr>
+                    <td width="120" height="40" align="right">栏目名称:</td>
+                    <td width="400" height="40">
+                        <input style="width: 60%" type="text"   class="text_need" name="model.dto.resName" id="resName">  <label id="msg"></label></td>
+                </tr>
+                <tr>
+                    <td width="120" height="35" align="right">栏 目URL:</td>
+                    <td width="400" height="35">
+                        <input style="width: 60%" type="text" name="model.dto.resUrl" id="resUrl" ></td>
+                </tr>
+                <tr>
+                    <td width="120" height="36" align="right">父 栏 目:</td>
+                    <td height="36" width="400">
+                        <input style="width: 60%" type="text" readonly  id="new_resParId">&nbsp;<a id="menuBtn" href="#" onclick="showMenuLst(); return false;">选择</a></td>
+                </tr>
+                <tr>
+                    <td width="120" height="36" align="right">是否有效:</td>
+                    <td height="40" width="400" align="left" valign="middle">
+                        <select  style="width: 60%" name="model.dto.enabled" id="enabled"><option value="Y">是</option><option value="N">否</option></select>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="120" height="36" align="right">是否可见:</td>
+                    <td width="400">
+                        <select style="width: 60%" name="model.dto.visible" id="visible"><option value="Y">是</option><option value="N">否</option></select>
+                    </td>
+                </tr>
+
+            </table>
+            <input type="hidden" name="model.dto.resId" id="resId">
+            <input type="hidden" name="model.dto.newResParId" id="newParId">
+            <input type="hidden" name="model.dto.resParId" id="old_resParId">
+            <input type="hidden"  id="old_resName">
+            <input type="hidden" name="model.dto.systemId" id="systemId">
+        </form>
+    </div>
+    <div id="resBar">
+        <a href="javascript:void(0);"  plain="true"  iconCls="icon-ok" onclick="do_Save_App()" class="easyui-linkbutton">保存</a>
+        <a href="javascript:void(0);" plain="true"  iconCls="icon-cancel" onclick="javascript: $('#resourceDialog').dialog('close');" class="easyui-linkbutton">关闭</a>
+    </div>
+
+
+</div>
+<div id="DropdownMenuBackground" style="display:none;z-index: 999999999999; position:absolute; height:350px; min-width:450px; background-color:white;border:2px solid #99BBE8;overflow-y:auto;overflow-x:auto;">
+    <ul id="dropdownMenu" class="ztree"></ul>
+</div>
+<!--<div region="center"  href="resource/resourceAction!query.action" style="overflow:hidden;"></div>-->
+<script type="text/javascript">
+    var editRow = undefined;
+    var resourceGrid;
+    resourceGrid=$('#resourceList').datagrid({
+        fit:true,
+        url: 'resource/resourceAction.action?act=query&model.startSearch=true&model.fromJquery=true',
+        remoteSort:false,
+        pagination:true,
+        pageList:[100, 150, 200],
+        pageSize:100,
+        singleSelect:true,
+        toolbar:[{
+            text:'新增',
+            iconCls:'icon-add',
+            handler:function(){
+                addTreeLst();
+            }}],
+        onClickRow:function(){
+            editTreeLst();
+        },
+        fitColumns:true,
+        idField:'resId',
+        columns:[[
+            {field:'resName',title:'栏目名称',width:100,align:'right',sortable:true,
+                editor:{
+                    type:'text',
+                    required:true
+                }
+            },
+            {field:'systemId',width:12,hidden:true
+            },
+            {field:'resId',title:'栏目编号',width:100,sortable:true},
+            {field:'resUrl',title:'栏目URL',width:300},
+            {field:'resParId',title:'父栏目代码',width:100},
+            {field:'resParName',title:'父栏目名称',width:100},
+            {field:'enabled',title:'是否有效',width:50,align:'right'},
+            {field:'visible',title:'是否可见',width:50,align:'right'}
+        ]]
+    })
+
+    function addTreeLst() {
+        $("#resourceDialog").dialog('open');
+        var resource = $('#resourceFrm').form();
+        resource.form('clear');
+        resource.form('load',{
+            "model.dto.resName":'',
+            "model.dto.resUrl":'',
+            "model.dto.resParId":'',
+            "model.dto.enabled":'',
+            "model.dto.visible":''
+        })
+        /*select下拉框的第二个元素为当前选中值*/
+        $('#enabled')[0].selectedIndex = 0;
+        $('#visible')[0].selectedIndex = 0;
+    }
+
+    function editTreeLst() {
+        var rows = resourceGrid.datagrid('getSelections');
+        if (rows.length == 1) {
+            $("#resourceDialog").dialog('open');
+            var resource = $('#resourceFrm').form();
+            resource.form('clear');
+            /*           resource.form('load',{
+             resName:rows[0].resName,
+             resUrl:[],
+             resParId:rows[0].resParId,
+             enabled:rows[0].enabled,
+             visible:rows[0].visible
+             });*/
+//            alert();
+            resource.form('load',{
+                "model.dto.resName":rows[0].resName,
+                "model.dto.resUrl":rows[0].resUrl,
+                "model.dto.resParId":rows[0].resParId,
+//                "model.dto.newResParId": rows[0].resParId,
+                "model.dto.enabled":rows[0].enabled,
+                "model.dto.visible":rows[0].visible
+            })
+//          resource.form('load',rows[0]);
+            var tempEnable=rows[0].enabled=="有效"?"Y":"N";
+            var tempVisible=rows[0].visible=="可见"?"Y":"N";
+            $("#msg").text("");
+            $("#enabled").attr("value",tempEnable);
+            $("#visible").attr("value",tempVisible);
+
+            $("#old_resParId").val(rows[0].resParId);
+            $("#newParId").val(rows[0].resParId);
+            $("#resId").val(rows[0].resId);
+            $("#new_resParId").val(rows[0].resParName);
+            $("#old_resName").val(rows[0].resName);
+            $("#systemId").val(rows[0].systemId);
+            /*     $("#resUrl").combobox({
+             data:[{
+             label: 'java',
+             value: 'Java'
+             },{
+             label: 'perl',
+             value: 'Perl'
+             },{
+             label: 'ruby',
+             value: 'Ruby'
+             }],
+             //                url: "", //你要跳转的做出处理的页面，要传的值拼接到后面
+             valueField: "label", //给下拉框value赋值的值
+             textField: "value", //给下拉框Text的赋值
+             multiple: false, //是否多选
+             panelHeight: "auto"
+             });*/
+            /*获取select被选中项的文本*/
+            //  alert($("select[name=enabled] option:selected").text());
+        } else {
+            $.messager.show({
+                msg : '请选择一项进行修改！',
+                title : '错误'
+            });
+        }
+    }
+    $("#resName").blur(function () {
+        var resName = $("#resName").val();
+        var reshiddenName=$("#old_resName").val();
+        var resId=$("#resId").val();
+        if($.trim(resName)==""){
+            $.messager.alert("提示","菜单名称不能为空","info");
+//            alert("菜单名称不能为空");
+//            $("#resName").focus();
+            return;
+        }
+        if(!resId=="" || resId!=null){
+            if(resName==reshiddenName){
+                return;
+            }
+        }
+        $.post(
+                'resource/resourceAction!existName.action',
+                {"model.dto.resName":encodeURIComponent(resName)},
+                function (data) {
+                    switch (data) {
+                        case"1":
+                            $("#msg").html('<span style="color:red;">菜单名称重复</span>');
+                            $("#resName").focus();
+                            break;
+                        case "0":
+                            $("#msg").html('<span style="color:red;">菜单名称可以用</span>');
+                            break;
+                        default:
+                            $.messager.alert("提示","发生错误","info");
+                            break;
+                    }
+                });
+    });
+
+</script>
+</body>
+
+</html>
+<script type="text/javascript">
+var zTreeNodes = "";
+var zTreeObj = "";
+var resourceListNodes="";
+var listNodesObj="";
+var setting;
+var listNodesSetting;
+listNodesSetting =  {
+    data:{
+        simpleData:{
+            enable:true,
+            idKey:"resId",
+            pIdKey:"resParId",
+            rootPId:"0000"
+        }
+    },
+    view:{
+        showIcon:true,
+        dblClickExpand:false
+    },
+    callback:{
+//            beforeOnClick: nodeOnBeforeClick,
+        onClick: nodeOnClick
+    }
+};
+setting = {
+    data:{
+        simpleData:{
+            enable:true,
+            idKey:"resId",
+            pIdKey:"resParId",
+            rootPId:"0000"
+        }
+    },
+    view:{
+        showIcon:true,
+        dblClickExpand:false
+    },
+    callback:{
+        onClick:zTreeOnClick,
+        beforeDrop: zTreeBeforeDrop,
+        onDrag:zTreeOnDrag,
+        onDrop:zTreeOnDrop
+    },
+    edit:{
+        enable:true,
+        showRemoveBtn:false,
+        showRenameBtn:false,
+        drag:{
+//            autoExpandTrigger:true,
+            next:true,
+            prev:true,
+            isMove:true,
+            inner:false
+//            autoOpenTime:0
+        }
+    }
+};
+$(function () {
+    $.post('resourceTree/resourceTree.action?act=treeApply', function (data) {
+        zTreeNodes = "[";
+        resourceListNodes="[";
+        zTreeNodes += "{'resId':''," +
+                "'resParId':''," +
+                "'systemId':''," +
+                "'open':true," +
+                "'icon':'css/tree/img/chart.png'," +
+                "'name':'工程转资系统'},";
+        resourceListNodes += "{'resId':''," +
+                "'resParId':''," +
+                "'systemId':''," +
+                "'open':true," +
+                "'name':''},";
+        for (var i = 0; i < data.length; i++) {
+            var isOpen = false;
+            if(data[i].resId == "0001"){
+                isOpen = true;
+            }
+            zTreeNodes += "{'resId':" + "'" + data[i].resId + "'" + "," +
+                    "'resParId':" + "'" + data[i].resParId + "'" + "," +
+                    "'url':" + "'" + data[i].resUrl + "'" + "," +
+                    "'systemId':" + "'" + data[i].systemId + "'" + "," +
+                    "'open':" + "'" + isOpen + "'" + "," +
+                    "'name':" + "'" + data[i].resName + "'}";
+            resourceListNodes  += "{'resId':" + "'" + data[i].resId + "'" + "," +
+                    "'resParId':" + "'" + data[i].resParId + "'" + "," +
+                    "'systemId':" + "'" + data[i].systemId + "'" + "," +
+                    "'open':" + "'" + isOpen + "'" + "," +
+                    "'name':" + "'" + data[i].resName + "'}";
+            if (i < data.length - 1) {
+                zTreeNodes += ",";
+                resourceListNodes += ",";
+            } else {
+                zTreeNodes += "]";
+                resourceListNodes += "]";
+            }
+        }
+        //把拼接的tree变成json对象传到ztree里面去
+        zTreeNodes = eval(zTreeNodes);
+
+        resourceListNodes=eval(resourceListNodes);
+        zTreeObj = $.fn.zTree.init($("#tree"), setting, zTreeNodes);
+        listNodesObj =$.fn.zTree.init($("#dropdownMenu"), listNodesSetting, resourceListNodes);
+        hideMenuLst();
+
+    }, "json");
+
+
+});
+$("body").bind("mousedown",
+        function(event){
+            if (!(event.target.id == "menuBtn" || event.target.id == "DropdownMenuBackground" || $(event.target).parents("#DropdownMenuBackground").length>0)) {
+                hideMenuLst();
+            }
+        });
+
+function showMenuLst() {
+    var resObj = $("#new_resParId");
+    var resOffset = $("#new_resParId").offset();
+    var dialog=$("#resourceDialog").offset();
+    $("#DropdownMenuBackground").css({left:dialog.left+ "px", top: "10px"}).slideDown("fast");
+//        $("#DropdownMenuBackground").css({left:resOffset.left-resObj.scrollLeft()  + "px", top: "10px"}).slideDown("fast");
+//        $("#DropdownMenuBackground").css({left:resOffset.left-resObj.outerHeight()  + "px", top:resOffset.top + resObj.outerHeight() + "px"}).slideDown("fast");
+
+}
+function hideMenuLst() {
+    $("#DropdownMenuBackground").fadeOut("fast");
+}
+
+//    function nodeOnBeforeClick(treeId, treeNode) {
+//
+////        var check = (treeNode && !treeNode.isParent);
+////        if (!check) alert("不能选择同级下的节点...");
+////        return check;
+//    }
+
+function nodeOnClick(event, treeId, treeNode) {
+    if (treeNode) {
+        var resObj = $("#new_resParId");
+        var newObj=$("#newParId");
+        resObj.attr("value", treeNode.name);
+        newObj.attr("value", treeNode.resId);
+        hideMenuLst();
+    }
+}
+
+function zTreeBeforeDrag(treeId, treeNodes) {
+    //判断是否同级节点，是的话就返回false
+    return true;
+}
+//每次开始进行拖拽节点后， 弹出被拖拽节点的个数信息
+function zTreeOnDrag(event, treeId, treeNodes) {
+
+}
+
+//禁止将节点拖拽成为根节点 ,拖拽结束之前的事件
+//还没想到好的法子不让他拖拽到同级或者子级的下面 ，
+function zTreeBeforeDrop(treeId, treeNodes, targetNode, moveType) {
+
+    if(targetNode==null){
+        return false;
+    }
+    if(treeNodes[0].getParentNode()!=targetNode.getParentNode()){
+        return false;
+    }
+
+  var n1=  treeNodes[0].resId.split(".");
+          var n2=targetNode.resId.split(".");
+//    if(n1.length<=1){
+//        return false;
+//    }
+    if(n1.length!=n2.length){
+        return false;
+    }
+    if(targetNode.resId==""){
+        return false;
+    }
+//    if(confirm("您要拖动到当前节点吗")==true){
+//        return true;
+//    }
+//    return false;
+    return true;
+    // return !(targetNode == null || (moveType != "inner" && !targetNode.parentTId));
+}
+//每次拖拽操作结束后， 弹出该被拖拽节点的个数以及目标节点的 tId、name 的信息 ，拖拽结束之后的事件
+function zTreeOnDrop(event, treeId, treeNodes, targetNode, moveType) {
+
+//    var actionURL = "resource/resourceAction.action";
+//    actionURL += "?act=save";
+//    $.post(actionURL, params, function(data){
+//        $.messager.alert("提示",data,"info");
+//    });
+    var nodes = zTreeObj.getNodesByParam("resId", treeNodes[0].resParId, null);
+//    var treenodes = zTreeObj.transformToArray(nodes);
+//    var jj="";
+//    for(var m=0;m<treenodes.length;m++){
+//       jj+=treenodes[m].name;
+//    }
+    //此处treeNode 为当前节点
+    var str ='' ;
+    str = getAllChildrenNodes(nodes[0],str);
+    var params = {
+        "model.dto.sortJson":str.substr(1)
+    };
+        $.post('resource/resourceAction.action?act=updateSort', params, function(data){
+
+    });
+}
+function getAllChildrenNodes(treeNode,result){
+    if (treeNode.isParent) {
+        var childrenNodes = treeNode.children;
+//        if (childrenNodes) {
+            for (var i = 0; i < childrenNodes.length; i++) {
+                result += ',' + childrenNodes[i].resId;
+//                result = getAllChildrenNodes(childrenNodes[i], result);
+            }
+//        }
+    }
+    return result;
+}
+//    function setFont(treeId, treeNode) {
+//        //第二种实现方式
+//        if (treeNode.level == 0) {
+//            return {color:"green"};
+//        } else if (treeNode.level == 1) {
+//            return {color:"red"};
+//        } else if (treeNode.level == 2) {
+//            return {color:"blue"};
+//        }
+//        return {};
+//
+//    }
+//鼠标点击事件，需要控制弹出框的位置什么之类。在此函数内设置
+function zTreeOnClick(event, treeId, treeNode) {
+    var treeObj = $.fn.zTree.getZTreeObj(treeId);
+    if (!treeNode.open) {
+        treeObj.expandNode(treeNode, false, false, false);
+    }
+    var param = treeNode.resId +'%';
+    var queryParams = $('#resourceList').datagrid('options').queryParams;
+    queryParams["model.dto.resId"] = encodeURIComponent(param);
+    var url = "resource/resourceAction.action";
+    url += "?act=query&model.startSearch=true&model.fromJquery=true";
+//        url += "&model.dto.resId=" +encodeURIComponent(param);
+
+    $('#resourceList').datagrid({url:url});
+    //$("#resourceList").treegrid('options').url = url;
+}
+
+function do_Check_Save(){
+       if($.trim($("#resName").val())==""){
+           $("#msg").html('<span style="color:red;">菜单名称不能为空</span>');
+           return false;
+       }
+    if($("#resId").val()==$("#newParId").val()){
+        $.messager.alert('提示', '不能放到自己栏目下面！', 'info');
+        return false;
+    }
+        return true;
+}
+</script>

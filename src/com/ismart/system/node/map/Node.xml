@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+    PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" 
+    "http://www.ibatis.com/dtd/sql-map-2.dtd">
+<sqlMap namespace="Resource">
+	<typeAlias alias="node" type="com.ismart.system.node.domain.Node" />
+	<typeAlias alias="tmp" type="com.ismart.system.code.domain.Cbox" />
+		<select id="nodeQuery" resultClass="node" parameterClass="node">
+		<![CDATA[select st.*
+				  from node_info st
+				 where (st.nodeid = #nodeid# or #nodeid#='')
+				   and (st.pid = #pid# or #pid#='')
+				   and (st.level = #level# or #level#='')
+				   and  st.nodename like '%$nodename$%'
+				   and (st.spurl =#spurl# or #spurl#='')
+				   and (st.sporder=#sporder# or #sporder# = '')
+				   order by st.pid, st.sporder
+		]]>
+		</select>
+		
+		<!-- <select id="nodeTree" resultClass="node" parameterClass="node">
+		<![CDATA[select st.*
+				  from node_info st
+				 where (st.nodeid = #nodeid# or #nodeid#='')
+				   and (st.pid = #pid# or #pid#='')
+				   and (st.level = #level# or #level#='')
+				   and  st.nodename like '%$nodename$%'
+				   and (st.spurl =#spurl# or #spurl#='')
+				   and (st.sporder=#sporder# or #sporder# = '')
+				   order by st.pid, st.sporder
+		]]>
+		</select> -->
+		
+		<select id="getNodeId" resultClass="java.lang.String">
+		<![CDATA[select max(nodeid)+1 from node_info]]>
+		</select>
+		
+		<select id="getUserTypeRightId" resultClass="java.lang.String">
+		<![CDATA[select max(rolenodeid)+1 from role_node]]>
+		</select>
+		
+		<insert id="insertNode" parameterClass="node">
+			INSERT INTO node_info ( nodeid,pid,nodename,level,spurl,sporder) VALUES (#nodeid#,#pid#,#nodename#,#level#,#spurl#,#sporder# )
+		</insert>
+		
+		
+		
+		<delete id="deleteNode" parameterClass="java.lang.String">
+			delete from node_info where nodeid=#nodeid#
+		</delete>
+		
+		<update id="updateNode" parameterClass="node">
+		<![CDATA[   UPDATE node_info  SET pid=#pid#, nodename=#nodename# ,level = #level#,spurl=#spurl#,sporder=#sporder# where nodeid=#nodeid#]]>
+		</update> 
+</sqlMap>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+    PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" 
+    "http://www.ibatis.com/dtd/sql-map-2.dtd">
+<sqlMap namespace="Cbox">
+	<typeAlias alias="cb" type="com.ismart.system.code.domain.Cbox" />
+	<typeAlias alias="codetype" type="com.ismart.system.code.domain.CodeType" />
+	<typeAlias alias="code" type="com.ismart.system.code.domain.Code" />
+		<select id="cbQuery" resultClass="code" parameterClass="cb">
+		<![CDATA[select * from code_info 
+                 where codetypename like '%$pid$%'
+		]]>
+		</select>
+		<select id="typeQuery" resultClass="codetype" >
+		<![CDATA[select *
+				  from code_type
+		]]>
+		</select>
+		
+</sqlMap>

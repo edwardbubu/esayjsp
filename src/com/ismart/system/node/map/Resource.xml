@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+    PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" 
+    "http://www.ibatis.com/dtd/sql-map-2.dtd">
+<sqlMap namespace="Resource">
+	<typeAlias alias="resource" type="com.sp.system.resources.model.Resource" />
+		<select id="resourceQuery" resultClass="resource" parameterClass="resource">
+		<![CDATA[select st.*
+				  from sp_tree st
+				 where (st.id = #id# or #id#='')
+				   and (st.pid = #pid# or #pid#='')
+				   and (st.level = #level# or #level#='')
+				   and (st.type = #type# or #type#='')
+				   and  st.value like '%$value$%'
+				   and (st.enable=#enable# or #enable# = '')
+				   and (st.spurl =#spurl# or #spurl#='')
+				   and (st.sporder=#sporder# or #sporder# = '')
+				   order by st.sporder
+		]]>
+		</select>
+		
+		<select id="getResourceId" resultClass="java.lang.String">
+		<![CDATA[select max(id)+1 from sp_tree]]>
+		</select>
+		
+		<insert id="insertResource" parameterClass="resource">
+			INSERT INTO sp_tree ( id,pid,value,level,type,enable,createdate,spurl,sporder) VALUES (#id#,#pid#,#value#,#level#,#type#,#enable#, now(),#spurl#,#sporder# )
+		</insert>
+		
+		<delete id="deleteResource" parameterClass="java.lang.String">
+			delete from sp_tree where id=#id#
+		</delete>
+		
+		<update id="updateResource" parameterClass="resource">
+		<![CDATA[   UPDATE sp_tree  SET pid=#pid#, value=#value# ,level = #level#,type= #type#,enable=#enable#,spurl=#spurl#,sporder=#sporder# where id=#id#]]>
+		</update> 
+</sqlMap>
