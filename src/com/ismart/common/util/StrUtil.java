@@ -6,7 +6,7 @@ public class StrUtil {
 			val = "";
 		} else if(val.toString().equals(" ")) {
             val = "";
-        }
+        } //sts
 		return val.toString();
 	}
 }
