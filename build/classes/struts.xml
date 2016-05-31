@@ -1,0 +1,40 @@
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd" >
+
+<struts>
+	<package  name="ismart" extends="struts-default" namespace="/">		
+		<!--用户  -->	
+		<action name="sysuser" class="sysuserAction" >
+		</action>
+		<action name="Login" class="sysuserAction">
+		</action>
+		<action name="Home" class="sysuserAction">
+			<result name="success">/home.jsp</result>
+		</action>
+		<!-- 小代码  -->
+		<action name="code" class="codeAction" >
+		</action>
+		<!-- 下拉框 -->
+		<action name="cbox" class="cbAction" >
+		</action>
+		<!-- 页面 -->	
+		<action name="node" class="nodeAction" >
+		</action>
+		<!--树 -->
+		<action name="treeMain" class="treeAction" >
+		   <result name="success">system/common/tree/Tree.jsp</result>
+		</action>
+		 <action name="init" class="treeAction" >
+		</action>
+		<action name="role" class="roleAction" >
+		</action>
+		<!-- 
+		<action name="Query" class="userAction">
+			<result name="success">/demo/vendor/vendorQuery.jsp</result>
+		</action>
+		<action name="user" class="userAction" >
+		</action>
+		 -->
+	</package>
+</struts>
